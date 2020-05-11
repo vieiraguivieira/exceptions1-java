@@ -1,29 +1,29 @@
 package application;
 
+import java.security.DomainLoadStoreParameter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
 import model.entities.Reservation;
+import model.exceptions.DomainException;
 
 public class Program2 {
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) {
 
 		Scanner sc = new Scanner(System.in);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-		System.out.print("Room number: ");
-		int number = sc.nextInt();
-		System.out.print("Check-in date (dd/MM/yyyy): ");
-		Date checkIn = sdf.parse(sc.next()); // entra como String e o sdf converte
-		System.out.print("Check-out date (dd/MM/yyyy): ");
-		Date checkOut = sdf.parse(sc.next());
+		try {
+			System.out.print("Room number: ");
+			int number = sc.nextInt();
+			System.out.print("Check-in date (dd/MM/yyyy): ");
+			Date checkIn = sdf.parse(sc.next()); // entra como String e o sdf converte
+			System.out.print("Check-out date (dd/MM/yyyy): ");
+			Date checkOut = sdf.parse(sc.next());
 
-		if (!checkOut.after(checkIn)) { // não consigo colocar no construtor porque teria que retornar um String
-			System.out.println("Error in reservation: Check-out date must be after check-in date");
-		} else {
 			Reservation reservation = new Reservation(number, checkIn, checkOut);
 			System.out.println("Reservation: " + reservation);
 
@@ -34,13 +34,14 @@ public class Program2 {
 			System.out.print("Check-out date (dd/MM/yyyy): ");
 			checkOut = sdf.parse(sc.next());
 
-			String error = reservation.updateDates(checkIn, checkOut);
-			if (error != null) {
-			System.out.println("Error in reservation: " + error);	
-			}else {
+			reservation.updateDates(checkIn, checkOut);
 			System.out.println("Reservation: " + reservation);
-			}
-
+		} catch (ParseException e) {
+			System.out.println("Invalid date format");
+		} catch (DomainException e) {
+			System.out.println("Error in reservation: " + e.getMessage()); // mensagem lá na instanciação da exceção
+		}catch (RuntimeException e) { // tipo de excecao generico para fazer upcasting pro RuntimeException
+			System.out.println("Unexpected error");
 		}
 
 		sc.close();
